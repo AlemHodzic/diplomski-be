@@ -310,8 +310,8 @@ app.get('/getRok/:id', async (req, res) => {
 
 app.post('/rok', (req, res) => {
     try {
-        connection.query(`insert into ispitni_rok (datum_otvaranja, datum_zatvaranja, br_ucionice, predmet_id)
-        values ('${req.body.datum_otvaranja}', '${req.body.datum_zatvaranja}', ${req.body.br_ucionice}, ${req.body.predmet_id});`, (err, rows) => {
+        connection.query(`insert into ispitni_rok (datum_ispita, datum_otvaranja, datum_zatvaranja, br_ucionice, predmet_id)
+        values ('${req.body.datum_ispita}', '${req.body.datum_otvaranja}', '${req.body.datum_zatvaranja}', ${req.body.br_ucionice}, ${req.body.predmet_id});`, (err, rows) => {
             res.status(200).json(rows[0]);
         })
     } catch (error) {
@@ -321,10 +321,11 @@ app.post('/rok', (req, res) => {
 
 app.put('/rok', (req, res) => {
     const { id: _id } = req.params
-    const post = req.body
+
+    console.log(req.body.rok_id)
     try {
         connection.query(`update ispitni_rok
-        set datum_otvaranja='${req.body.datum_otvaranja}', datum_zatvaranja='${req.body.datum_zatvaranja}', br_ucionice=${req.body.br_ucionice}, predmet_id=${req.body.predmet_id}
+        set datum_ispita='${req.body.datum_ispita}', datum_otvaranja='${req.body.datum_otvaranja}', datum_zatvaranja='${req.body.datum_zatvaranja}', br_ucionice=${req.body.br_ucionice}, predmet_id=${req.body.predmet_id}
         where rok_id = ${req.body.rok_id}`, (err, rows) => {
             res.status(200).json(rows[0]);
         })
