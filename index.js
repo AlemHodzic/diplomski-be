@@ -260,7 +260,7 @@ app.put('/predmet', (req, res) => {
     try {
         connection.query(`update predmet
         set naziv='${req.body.naziv}', opis='${req.body.opis}', ECTS=${req.body.ECTS}, odsjek_id=${req.body.odsjek_id}, profesor_id=${req.body.profesor_id}, godina_studija=${req.body.godina_studija}
-        where predmet_id = 1`, (err, rows) => {
+        where predmet_id = ${req.body.predmet_id}`, (err, rows) => {
             res.status(200).json(rows[0]);
         })
     } catch (error) {
@@ -297,7 +297,7 @@ app.get('/getRokovi', (req, res) => {
 })
 
 
-app.get('/getRokovi/:id', async (req, res) => {
+app.get('/getRok/:id', async (req, res) => {
     const { id: _id } = req.params
     try {
         connection.query(`call dohvatiRok(${_id})`, (err, rows) => {
@@ -308,10 +308,39 @@ app.get('/getRokovi/:id', async (req, res) => {
     }
 })
 
-app.post('/rokovi', (req, res) => {
+app.post('/rok', (req, res) => {
     try {
-        connection.query(`insert into predmet (naziv, opis, ECTS, odsjek_id, profesor_id, godina_studija)
-        values ('${req.body.naziv}', '${req.body.opis}', ${req.body.ECTS}, ${req.body.odsjek_id}, ${req.body.profesor_id}, ${req.body.godina_studija});`, (err, rows) => {
+        connection.query(`insert into ispitni_rok (datum_otvaranja, datum_zatvaranja, br_ucionice, predmet_id)
+        values ('${req.body.datum_otvaranja}', '${req.body.datum_zatvaranja}', ${req.body.br_ucionice}, ${req.body.predmet_id});`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
+
+app.put('/rok', (req, res) => {
+    const { id: _id } = req.params
+    const post = req.body
+    try {
+        connection.query(`update ispitni_rok
+        set datum_otvaranja='${req.body.datum_otvaranja}', datum_zatvaranja='${req.body.datum_zatvaranja}', br_ucionice=${req.body.br_ucionice}, predmet_id=${req.body.predmet_id}
+        where rok_id = ${req.body.rok_id}`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
+
+app.put('/archiveRok', (req, res) => {
+    const { id: _id } = req.params
+    const post = req.body
+    try {
+        connection.query(`update ispitni_rok
+        set
+        active= 'no'
+        where rok_id = ${req.body.rok_id};`, (err, rows) => {
             res.status(200).json(rows[0]);
         })
     } catch (error) {
