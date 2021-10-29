@@ -86,8 +86,8 @@ app.post('/', (req, res) => {
     }
 
     try {
-        connection.query(`insert into korisnik (korisnik_id, ime, prezime, JMBG, sifra, email)
-            values (${korisnik_id},'${req.body.ime}', '${req.body.prezime}', ${req.body.JMBG}, '${req.body.sifra}', '${req.body.email}');`, (err, rows) => {
+        connection.query(`insert into korisnik (rola, korisnik_id, ime, prezime, JMBG, sifra, email)
+            values ('student',${korisnik_id},'${req.body.ime}', '${req.body.prezime}', ${req.body.JMBG}, '${req.body.sifra}', '${req.body.email}');`, (err, rows) => {
             res.status(200).json(rows[0]);
             console.log("uspjesno dodan x2")
 
@@ -143,8 +143,8 @@ app.post('/profesor', (req, res) => {
     let korisnik_id = Math.floor(Math.random() * 999999);
     console.log(korisnik_id);
     try {
-        connection.query(`insert into korisnik (korisnik_id, ime, prezime, JMBG, sifra, email)
-            values (${korisnik_id},'${req.body.ime}', '${req.body.prezime}', ${req.body.JMBG}, '${req.body.sifra}', '${req.body.email}');`, (err, rows) => {
+        connection.query(`insert into korisnik (rola, korisnik_id, ime, prezime, JMBG, sifra, email)
+            values ('profesor', ${korisnik_id},'${req.body.ime}', '${req.body.prezime}', ${req.body.JMBG}, '${req.body.sifra}', '${req.body.email}');`, (err, rows) => {
             res.status(200).json(rows[0]);
             console.log("uspjesno dodan x2")
 
@@ -342,6 +342,70 @@ app.put('/archiveRok', (req, res) => {
         set
         active= 'no'
         where rok_id = ${req.body.rok_id};`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
+
+
+
+//NOVOST
+
+
+app.get('/novost', (req, res) => {
+    try {
+        connection.query("call dohvatiNovosti", (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
+
+app.get('/novost/:id', async (req, res) => {
+    const { id: _id } = req.params
+    try {
+        connection.query(`call dohvatiNovost(${_id})`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
+
+
+
+app.post('/novost', (req, res) => {
+    try {
+        connection.query(`insert into novosti (naslov, podnaslov, sadrzaj, slika, datum_kreiranja)
+        values ('${req.body.naslov}', '${req.body.podnaslov}', '${req.body.sadrzaj}', '${req.body.slika}', '${req.body.datum_kreiranja}');`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
+
+
+app.post('/deleteNovost', (req, res) => {
+    try {
+        connection.query(`delete from novosti where idnovosti=${req.body.idnovosti} `, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
+
+
+
+
+//LOGIN
+app.post('/login', (req, res) => {
+    try {
+        connection.query(`call login('${req.body.email}', '${req.body.pw}')`, (err, rows) => {
             res.status(200).json(rows[0]);
         })
     } catch (error) {
