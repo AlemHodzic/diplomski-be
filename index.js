@@ -400,6 +400,17 @@ app.post('/deleteNovost', (req, res) => {
 })
 
 
+app.get('/aktuelnosti', (req, res) => {
+    try {
+        connection.query("call aktuelnosti", (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
+
+
 
 
 //LOGIN
@@ -413,253 +424,102 @@ app.post('/login', (req, res) => {
     }
 })
 
-
-
-/*
-let newUser = {
-    ime: 'aa',
-    prezime: 'bb',
-    email: 'a@a.com',
-    sifra: 'sif',
-    rola: 'korisnikRola',
-    adresa: 'adr',
-    broj: 123456,
-    korisnickoIme: 'kime'
-}
-
-app.post('/register',urlencode
-dParser, (req,res) => {
-    newUser.ime = req.body.firstname;
-    newUser.prezime = req.body.lastname;
-    newUser.email = req.body.email;
-    newUser.sifra = req.body.password;
-    connection.query(
-        `INSERT INTO Korisnik(ime, prezime, email, sifra, rola, adresa, broj, korisnickoIme)
-        VALUES (
-         '${newUser.ime}',
-         '${newUser.prezime}',
-         '${newUser.email}',
-         '${newUser.sifra}',
-         '${newUser.rola}',
-         '${newUser.adresa}',
-         '${newUser.broj}',
-         '${newUser.korisnickoIme}')`
-         ,(err,rows) => {
-       if(err){
-         throw err
-       }
-       console.log('Korisnik dodan u db.')
-       })
-       getUsers();
-})
-
-
-
-
-let podaci = null;
-let produkti = null;
-let reviews = null;
-let id;
-let singleProduct;
-
-const getUsers = (req, res) => {
+//ROK_STUDENTI
+app.get('/fetchUser/:id', (req, res) => {
+  
     try {
-        connection.query( "SELECT * FROM Korisnik",(err,rows) => {
-    if(err){
-      throw err
-    }
-    podaci = rows;
-    })
-
+        connection.query(`call fetchStudent(${req.params.id})`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
     } catch (error) {
-        res.status(404).json({message: error.message})
+        res.status(404).json({ message: error.message })
     }
-}
+})
 
-getUsers();
+app.post('/prijaviRok', (req, res) => {
 
-const getReviews = (req, res) => {
     try {
-        connection.query( "SELECT * FROM Recenzija",(err,rows) => {
-    if(err){
-      throw err
-    }
-    reviews = rows;
-    })
-
+        connection.query(`insert into rok_studenti (rok_id, student_indeks)
+        values (${req.body.rok_id}, ${req.body.student_indeks})`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
     } catch (error) {
-        res.status(404).json({message: error.message})
+        res.status(404).json({ message: error.message })
     }
-}
-
-getReviews();
-
-app.get('/getUsers', (req,res) => {
-    res.json({
-        podaci
-    })
 })
 
-app.get('/getReviews', (req,res) => {
-    res.json({
-        reviews
-    })
-})
-
-app.get('/getProducts', (req,res) => {
-    res.json({
-        produkti
-    })
-})
-
-app.get('/getProducts/:id', (req,res) => {
-    singleProduct = produkti.filter(x => x.proizvodID == req.params.id)
-    res.json({
-        singleProduct
-    })
-})
-
-
-const getProducts = (req, res) => {
+app.get('/fetchRok/:id', (req, res) => {
     try {
-        connection.query( "SELECT * FROM Proizvod",(err,rows) => {
-    if(err){
-      throw err
-    }
-    produkti = rows;
-    })
-
+        connection.query(`call dohvatiRokZaStudenta(${req.params.id})`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
     } catch (error) {
-        res.status(404).json({message: error.message})
+        res.status(404).json({ message: error.message })
     }
-}
-
-getProducts();
-
-
-
-
-let newUser = {
-    ime: 'aa',
-    prezime: 'bb',
-    email: 'a@a.com',
-    sifra: 'sif',
-    rola: 'korisnikRola',
-    adresa: 'adr',
-    broj: 123456,
-    korisnickoIme: 'kime'
-}
-
-app.post('/register',urlencodedParser, (req,res) => {
-    newUser.ime = req.body.firstname;
-    newUser.prezime = req.body.lastname;
-    newUser.email = req.body.email;
-    newUser.sifra = req.body.password;
-    connection.query(
-        `INSERT INTO Korisnik(ime, prezime, email, sifra, rola, adresa, broj, korisnickoIme)
-        VALUES (
-         '${newUser.ime}',
-         '${newUser.prezime}',
-         '${newUser.email}',
-         '${newUser.sifra}',
-         '${newUser.rola}',
-         '${newUser.adresa}',
-         '${newUser.broj}',
-         '${newUser.korisnickoIme}')`
-         ,(err,rows) => {
-       if(err){
-         throw err
-       }
-       console.log('Korisnik dodan u db.')
-       })
-       getUsers();
 })
 
-let newReview = {
-    pID: 0,
-    kID: 0,
-    sadRec: '',
-    oc: 0,
-}
-
-app.post('/addReview',urlencodedParser, (req,res) => {
-    newReview.pID = req.body.proizvodID;
-    newReview.kID = req.body.korisnikID;
-    newReview.sadRec = req.body.sadrzajRecenzije;
-    newReview.oc = req.body.ocjena;
-    connection.query(
-        `INSERT INTO Recenzija (proizvodID, korisnikID, sadrzajRecenzije, ocjena)
-        VALUES ('${newReview.pID}','${newReview.kID}','${newReview.sadRec}','${newReview.oc}');`,(err,rows) => {
-       if(err){
-         throw err
-       }
-       console.log('Recenzija dodana u db.')
-       })
-       getReviews();
+app.get('/fetchPrijavljene', (req, res) => {
+    try {
+        connection.query(`call dohvatiSvePrijave()`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
 })
 
-let newProduct = {
-  cijenaProizvoda: 0,
-  bojaProizvoda: 'n',
-  kvantitetProizvoda: 0,
-  brendProizvoda: 'n',
-  kategorijaProizvoda: '',
-  imeProizvoda: '',
-  opisProizvoda: '',
-  slikaUrl: ''
-}
 
-app.post('/addProduct',urlencodedParser, (req,res) => {
-    newProduct.cijenaProizvoda = Number(req.body.cijenaProizvoda);
-    newProduct.kvantitetProizvoda = Number(req.body.kvantitetProizvoda);
-    newProduct.kategorijaProizvoda = req.body.kategorijaProizvoda;
-    newProduct.imeProizvoda = req.body.imeProizvoda;
-    newProduct.opisProizvoda = req.body.opisProizvoda;
-    newProduct.slikaUrl = req.body.slikaUrl;
-    connection.query(
-        `INSERT INTO Proizvod (cijenaProizvoda, bojaProizvoda, kvantitetProizvoda, brendProizvoda, kategorijaProizvoda, imeProizvoda, opisProizvoda, slikaUrl)
-        VALUES ('${newProduct.cijenaProizvoda}','${newProduct.bojaProizvoda}','${newProduct.kvantitetProizvoda}','${newProduct.brendProizvoda}','${newProduct.kategorijaProizvoda}','${newProduct.imeProizvoda}','${newProduct.opisProizvoda}','${newProduct.slikaUrl}')`,(err,rows) => {
-       if(err){
-         throw err
-       }
-       console.log('Proizvod dodan u db.')
-       })
-       getProducts();
+app.post('/deletePrijavu', (req, res) => {
+    try {
+        connection.query(`delete from rok_studenti where student_indeks=${req.body.student_indeks} and rok_id = ${req.body.rok_id} `, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
 })
 
-app.delete('/deleteUser/:id', urlencodedParser, (req,res) => {
-    connection.query(`DELETE FROM Korisnik WHERE korisnikID = ${req.params.id}`, 1, (error, results, fields) => {
-        if (error)
-          return console.error(error.message);
-          getUsers();
-        console.log('Deleted Row(s):', results.affectedRows);
-      });
+//OCJENJIVANJE
+
+app.get('/ocjene', (req, res) => {
+    try {
+        connection.query("call prikaziOcjene", (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
 })
 
-app.delete('/deleteProduct/:id', urlencodedParser, (req,res) => {
-    connection.query(`DELETE FROM Proizvod WHERE proizvodID = ${req.params.id}`, 1, (error, results, fields) => {
-        if (error)
-          return console.error(error.message);
-          getProducts();
-        console.log('Deleted Row(s):', results.affectedRows);
-      });
+app.get('/ocjena/:id', (req, res) => {
+    try {
+        connection.query(`call prikaziJednuOcjenu(${req.params.id})`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
 })
 
-app.put('/editProduct/:id', urlencodedParser, (req,res) => {
-    console.log(req.body)
-    newProduct.cijenaProizvoda = req.body.cijenaProizvoda;
-    newProduct.kvantitetProizvoda = req.body.kvantitetProizvoda;
-    newProduct.kategorijaProizvoda = req.body.kategorijaProizvoda;
-    newProduct.imeProizvoda = req.body.imeProizvoda;
-    newProduct.opisProizvoda = req.body.opisProizvoda;
-    newProduct.slikaUrl = req.body.slikaUrl;
-    connection.query(`UPDATE Proizvod
-    SET cijenaProizvoda = '${newProduct.cijenaProizvoda}', kvantitetProizvoda = '${newProduct.kvantitetProizvoda}', kategorijaProizvoda = '${newProduct.kategorijaProizvoda}', imeProizvoda = '${newProduct.imeProizvoda}', opisProizvoda = '${newProduct.opisProizvoda}', slikaUrl = '${newProduct.slikaUrl}'
-    WHERE proizvodID = ${req.params.id}`, 1, (error, results, fields) => {
-        if (error)
-          return console.error(error.message);
-          getProducts();
-        console.log('Updated Row(s):', results.affectedRows);
-      });
+app.put('/editOcjena', (req, res) => {
+    const { id: _id } = req.params
+    const post = req.body
+    try {
+        connection.query(`update ocjena set ocjena = ${req.body.ocjena} where idocjena = ${req.body.idocjena};`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
 })
-getProducts(); */
+
+app.post('/unesiOcjenu', (req, res) => {
+
+    try {
+        connection.query(`insert into ocjena (student_indeks, rok_id, ocjena, predmet_id) values (${req.body.student_indeks}, ${req.body.rok_id}, ${req.body.ocjena}, ${req.body.predmet_id})`, (err, rows) => {
+            res.status(200).json(rows[0]);
+        })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+})
