@@ -17,10 +17,10 @@ app.use(express.json({ limit: '1mb' }))
 console.log('App is listening on port' + port);
 
 var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'studentska-sluzba',
+    host: 'sql11.freesqldatabase.com',
+    user: 'sql11448898',
+    password: 'wjzvjMYJDB',
+    database: 'sql11448898',
     port: '3306'
 })
 
